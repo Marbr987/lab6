@@ -1,0 +1,11 @@
+Package: lab6
+Type: Package
+Title: Algorithms for Knapsack Problem
+Version: 1.0
+Date: 2021-09-29
+Authors@R: c(person("Dharani", "Ganesan", role = c("aut", "cre"), email = "dhaga613@student.liu.se"))
+Description: The package provides three different algorithms for solutions to the knapsack problem, each with different computational complexity. One provides the optimal solution, but is very computationally expensive, one is computationally cheaper but provides an optimal solution only for integer weights and the third one is a heuristic which is computationally even cheaper but the solution is not expected to be as good as for the other two algorithms.
+Encoding: UTF-8
+License: MIT + file LICENSE
+LazyData: true
+RoxygenNote: 7.1.2
