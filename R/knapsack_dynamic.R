@@ -5,6 +5,10 @@
 #' @return list with the value of the items in the knapsack and the elements contained in the knapsack.
 #' @export
 knapsack_dynamic <- function(x, W){
+  # Check if input x is correct
+  if(names(x) != c("w", "v") || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
+  
+  # Calculate the max value
   m <- matrix(nrow = nrow(x) + 1, ncol = W + 1, dimnames = list(0:nrow(x), 0:W))
   m[0+1,] <- 0
   m[,0+1] <- 0
@@ -18,6 +22,8 @@ knapsack_dynamic <- function(x, W){
       }
     }
   }
+  
+  # Get the elements which are in the knapsack for max value
   get_items <- function(i, j){
     if (i == 0){
       return(c())
@@ -30,6 +36,8 @@ knapsack_dynamic <- function(x, W){
     }
   }
   elements <- get_items(nrow(x), W)
+  
+  # Return result
   result <- list(value=round(m[nrow(x)+1,W]), elements=elements)
   return(result)
 }
