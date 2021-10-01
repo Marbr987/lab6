@@ -6,6 +6,7 @@
 #' @export
 
 brute_force_knapsack <- function(x, W){
+<<<<<<< HEAD
 some_number = c()  
 some_element1=c()
 some_element2= c()
@@ -53,3 +54,11 @@ knapsack_objects <-
 }
 brute_force_knapsack(x = knapsack_objects[1:12,], W = 2000)
 brute_force_knapsack(x = knapsack_objects[1:8,], W = 3500)
+=======
+  # Check if input x is correct
+  if(names(x) != c("w", "v") || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
+  # some code
+  result <- list(value="some number", elements=c("some element1", "some element2"))
+  return(result)
+}
+>>>>>>> 42b30f05cec1d88374aa1135a9b9ab64a9195fff
