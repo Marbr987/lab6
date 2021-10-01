@@ -9,6 +9,7 @@ greedy_knapsack <- function(x, W){
   # Check if input x is correct
   if(names(x) != c("w", "v") || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
   # some code
+  # 
   result <- list(value="some number", elements=c("some element1", "some element2"))
   return(result)
 }
