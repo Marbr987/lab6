@@ -1,0 +1,63 @@
+---
+title: "lab6-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{lab6-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lab6)
+```
+
+## Setup
+To install the lab5 package, source it from GitHub with the command `devtools::install_github("Marbr987/lab6", build_vignettes = TRUE)`.
+
+## Load the Test Data
+
+```{r}
+RNGversion(min(as.character(getRversion()),"3.5.3"))
+##old sampler used for backward compatibility
+## suppressWarnings() can be used so that the above warning is not displayed
+n <- 2000
+knapsack_objects <- data.frame(
+  w=sample(1:4000, size = n, replace = TRUE),
+  v=runif(n = n, 0, 10000)
+)
+```
+
+## Usage of the Package
+The package includes three functions to solve the 0-1-knapsack-problem. All of the functions have an input `x` (a dataframe with columns `w` containing the weight of each element and `v` containing the value of the respective element) and `W` (the maximum weight the knapsack can carry).
+Furthermore, all the three functions return a list containing the maximum value under the given weight limit and the elements of this solution.  
+
+### Brute Force Algorithm
+The first function is called `brute_force_knapsack` and solves the problem by testing every possible combination of elements in the knapsack and calculating their weight. The initial computation time for n = 16 objects was 13 seconds.
+
+```{r}
+st <- system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000))
+print(paste0("time needed: ", toString(as.numeric(st)[1]), "s"))
+```
+
+### Dynamic Programming
+The second function is called `knapsack_dynamic` and solves the problem by iterating over all possible values of w. The initial computation time for n = 500 objects was 2.5 seconds.
+
+```{r}
+st <- system.time(bfk <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 2000))
+print(paste0("time needed: ", toString(as.numeric(st)[1]), "s"))
+```
+
+### Brute Force Algorithm
+The third and last function is called `greedy_knapsack` and does not always find the optimal solution to the problem but reduces the computational complexity considerably. The initial computation time for n = 1000000 objects was 0.85 seconds.
+
+```{r}
+st <- system.time(bfk <- greedy_knapsack(x = knapsack_objects[1:1000000,], W = 2000))
+print(paste0("time needed: ", toString(as.numeric(st)[1]), "s"))
+```
