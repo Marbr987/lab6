@@ -21,12 +21,12 @@ test_that("functions rejects errounous input.", {
 
 test_that("Function return correct results.", {
   kd <- knapsack_dynamic(x = knapsack_objects[1:8,], W = 3500)
-  expect_equal(round(kd$value), 15428)
-  expect_true(all(round(kd$elements) %in% c(3, 8)))
+  expect_equal(round(kd$value), 16770)
+  expect_true(all(round(kd$elements) %in% c(5, 8)))
   
   kd <- knapsack_dynamic(x = knapsack_objects[1:12,], W = 3500)
-  expect_equal(round(kd$value), 15428)
-  expect_true(all(round(kd$elements) %in% c(3, 8)))
+  expect_equal(round(kd$value), 16770)
+  expect_true(all(round(kd$elements) %in% c(5, 8)))
   
   kd <- knapsack_dynamic(x = knapsack_objects[1:8,], W = 2000)
   expect_equal(round(kd$value), 15428)
