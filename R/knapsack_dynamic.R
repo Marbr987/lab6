@@ -6,7 +6,7 @@
 #' @export
 knapsack_dynamic <- function(x, W){
   # Check if input x is correct
-  if(names(x) != c("w", "v") || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
+  if(!identical(names(x), c("w", "v")) || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
   if(W < 0){stop("W must not be negative")}
   
   # Calculate the max value
