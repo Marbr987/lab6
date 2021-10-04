@@ -7,6 +7,7 @@
 knapsack_dynamic <- function(x, W){
   # Check if input x is correct
   if(names(x) != c("w", "v") || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
+  if(W < 0){stop("W must not be negative")}
   
   # Calculate the max value
   m <- matrix(nrow = nrow(x) + 1, ncol = W + 1, dimnames = list(0:nrow(x), 0:W))
