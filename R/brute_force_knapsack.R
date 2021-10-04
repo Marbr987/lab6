@@ -6,38 +6,26 @@
 #' @export
 
 brute_force_knapsack <- function(x, W){
-  if(names(x) != c("w", "v") || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
+  if(!identical(names(x), c("w", "v")) || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
   if(W < 0){stop("W must not be negative")}
-  value = c()  
-  elements=c()
-  weight=c()
-  value=c()
-  #Going through rows until we reach the end.
-  i=1
-  while(i <= nrow(x)){ 
-  w = as.data.frame(combn(x[,1], i)) 
-  v = as.data.frame(combn(x[,2], i)) 
-  sum_w = colSums(w)
-  sum_v = colSums(v)
-  #sum the largest from whole weight combination.
-  weight = which(sum_w<= W) 
-  #item with largest value for whole weight.
-  if(length(weight) != 0)
-  { 
-  value = sum_v[weight]
-  value =max(value)
-  A= which((value) == value)
-  maxValWghtIdx =weight[A]
-  maxValWght = w[,maxValWghtIdx]
-  #add number of chosen items with max value to some_element 1.
-  j = 1
-  while (j<=i){
-  elements[j] =which(x[,1] == maxValWght[j])
-  j=j+1
+  
+  values <- c()
+  weights <- c()
+  counter <- 1:2^nrow(x)
+  vec_length <- 1:nrow(x)
+  combinations <- lapply(counter-1, intToBits)
+  combinations <- lapply(combinations, function(x){as.numeric(x)})
+  combinations <- lapply(combinations, function(x){x[vec_length]})
+  for (i in counter) {
+    temp_df <- combinations[[i]] * x
+    values[i] <- sum(temp_df$v)
+    weights[i] <- sum(temp_df$w)
   }
-  }
-  i=i+1
-  }
-  return(list(value = round(value), elements = elements))
-  return(result)
+  relevant_indices <- which(weights <= W)
+  max_value <- max(values[relevant_indices])
+  result_index <- which(values == max_value)
+  elements <- which(combinations[[result_index]] == 1)
+  
+  
+  return(list(value = round(max_value), elements = elements))
 }
