@@ -7,7 +7,7 @@
 #' @export
 greedy_knapsack <- function(x, W){
   # Check if input x is correct
-  if(names(x) != c("w", "v") || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
+  if(!identical(names(x), c("w", "v")) || ncol(x) != 2 || typeof(x) != "list"){stop("x must be a dataframe with column names w and v")}
   if(W < 0){stop("W must not be negative")}
   
   perm = order(x$v/x$w, decreasing = TRUE)
@@ -24,15 +24,3 @@ greedy_knapsack <- function(x, W){
   result <- list(value = round(total_value), elements = elements)
   return(result)
 }
-
-RNGversion(min(as.character(getRversion()),"3.5.3"))
-set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-n <- 2000
-knapsack_objects <-
-  data.frame(
-    w=sample(1:4000, size = n, replace = TRUE),
-    v=runif(n = n, 0, 10000)
-  )
-
-greedy_knapsack(x = knapsack_objects[1:800,], W = 3500)
-greedy_knapsack(x = knapsack_objects[1:1200,], W = 2000)
