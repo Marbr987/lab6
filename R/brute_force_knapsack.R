@@ -2,6 +2,7 @@
 #' @description An algorithm that tries every possible alternatives of items in the knapsack and returns the optimal solution.
 #' @param x dataframe with columns w and v (weight and value) representing the items
 #' @param W double representing the weight limit of the knapsack
+#' @param parallel boolean whether the code should be run in parallel or not. Default is to FALSE.
 #' @return list with the value of the items in the knapsack and the elements contained in the knapsack.
 #' @importFrom parallel mclapply
 #' @export
