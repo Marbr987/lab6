@@ -9,9 +9,12 @@ Encoding: UTF-8
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 7.1.2
+Imports:
+    parallel,
 Suggests: 
     knitr,
     rmarkdown,
+    profvis,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr

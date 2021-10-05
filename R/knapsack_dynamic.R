@@ -10,16 +10,18 @@ knapsack_dynamic <- function(x, W){
   if(W < 0){stop("W must not be negative")}
   
   # Calculate the max value
+  w <- x$w
+  v <- x$v
   m <- matrix(nrow = nrow(x) + 1, ncol = W + 1, dimnames = list(0:nrow(x), 0:W))
   m[0+1,] <- 0
   m[,0+1] <- 0
   for (i in 1:nrow(x)) {
     for (j in 0:W){
-      if (x$w[i] > j) {
+      if (w[i] > j) {
         m[i+1, j+1] <- m[i, j+1]
       }
       else {
-        m[i+1, j+1] <- max(m[i, j+1], m[i, j-x$w[i]+1] + x$v[i])
+        m[i+1, j+1] <- max(m[i, j+1], m[i, j-w[i]+1] + v[i])
       }
     }
   }

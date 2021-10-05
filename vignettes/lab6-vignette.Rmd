@@ -16,17 +16,19 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(lab6)
+library(parallel) # package used for parallel computation
 ```
 
 ## Setup
 To install the lab5 package, source it from GitHub with the command `devtools::install_github("Marbr987/lab6", build_vignettes = TRUE)`.
 
-## Load the Test Data
+#### Loading the Test Data
 
 ```{r}
 RNGversion(min(as.character(getRversion()),"3.5.3"))
 ##old sampler used for backward compatibility
 ## suppressWarnings() can be used so that the above warning is not displayed
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
 n <- 2000
 knapsack_objects <- data.frame(
   w=sample(1:4000, size = n, replace = TRUE),
@@ -35,29 +37,103 @@ knapsack_objects <- data.frame(
 ```
 
 ## Usage of the Package
-The package includes three functions to solve the 0-1-knapsack-problem. All of the functions have an input `x` (a dataframe with columns `w` containing the weight of each element and `v` containing the value of the respective element) and `W` (the maximum weight the knapsack can carry).
-Furthermore, all the three functions return a list containing the maximum value under the given weight limit and the elements of this solution.  
 
-### Brute Force Algorithm
+### How the Functions work
+
+The package includes three functions to solve the 0-1-knapsack-problem. All of the functions have an input `x` (a dataframe with columns `w` containing the weight of each element and `v` containing the value of the respective element) and `W` (the maximum weight the knapsack can carry).
+Furthermore, all the three functions return a list containing the maximum value (or a "good" solution like the `greedy_knapsack` function) under the given weight limit and the elements of this solution (see example below).
+
+```{r}
+brute_force_knapsack(x = knapsack_objects[1:8,], W = 3500)
+knapsack_dynamic(x = knapsack_objects[1:8,], W = 3500)
+greedy_knapsack(x = knapsack_objects[1:8,], W = 3500)
+```
+
+### How the Profiling was conducted
+
+For profiling the code the `profvis` package was used. After loading the package `library(profvis)` the function which should be analysed was loaded with `source(my_function.R)` and profiled with `profvis(my_function(some_input))`. The interactive plot displays the the computation time needed for each line of code in the `my_function.R` file.
+
+### Computational Complexity of the Algorithms and Improvements
+#### Brute Force Algorithm
 The first function is called `brute_force_knapsack` and solves the problem by testing every possible combination of elements in the knapsack and calculating their weight. The initial computation time for n = 16 objects was 13 seconds.
 
 ```{r}
 st <- system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000))
-print(paste0("time needed: ", toString(as.numeric(st)[1]), "s"))
+print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
 ```
 
-### Dynamic Programming
+Profiling the code with `profvis` showed that the initially used for-loop is by far the biggest computational bottleneck. Therefore, the for-loop was changed from
+
+```{r eval=FALSE}
+  for (i in counter) {
+    temp_df <- combinations[[i]] * x # takes especially long
+    values[i] <- sum(temp_df$v)
+    weights[i] <- sum(temp_df$w)
+  }
+```
+
+to a parallel computation:
+
+```{r eval=FALSE}
+  for (i in counter) {
+    temp_dfs <- parallel::mclapply(combinations, function(y){y * x})
+    values <- sapply(temp_dfs, function(x){sum(x$v)})
+    weights <- sapply(temp_dfs, function(x){sum(x$w)})
+  }
+```
+
+The computation time needed for 16 objects with parallel computation is 0.5 seconds resulting in a performance gain of 12.5 seconds.
+```{r}
+st <- system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000, parallel=TRUE))
+print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
+```
+
+#### Dynamic Programming
 The second function is called `knapsack_dynamic` and solves the problem by iterating over all possible values of w. The initial computation time for n = 500 objects was 2.5 seconds.
 
 ```{r}
 st <- system.time(bfk <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 2000))
-print(paste0("time needed: ", toString(as.numeric(st)[1]), "s"))
+print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
 ```
 
-### Brute Force Algorithm
+Profiling the code with `profvis` showed that the most computation time was needed for the for-loop inside the function. The code was sped up changing the indexing of the input dataframe
+
+```{r eval=FALSE}
+for (i in 1:nrow(x)) {			
+  for (j in 0:W){			
+    if (x$w[i] > j) {			
+      m[i+1, j+1] <- m[i, j+1]			
+    }			
+    else {			
+      m[i+1, j+1] <- max(m[i, j+1], m[i, j-x$w[i]+1] + x$v[i])			
+    }			
+  }
+}
+```
+
+to indexing of vectors which resulted in a performance gain of 1.3 seconds.
+
+```{r eval=FALSE}
+w <- x$w
+v <- x$v
+for (i in 1:nrow(x)) {
+  for (j in 0:W){
+    if (w[i] > j) {
+      m[i+1, j+1] <- m[i, j+1]
+    }
+    else {
+      m[i+1, j+1] <- max(m[i, j+1], m[i, j-w[i]+1] + v[i])
+    }
+  }
+}
+```
+
+#### Brute Force Algorithm
 The third and last function is called `greedy_knapsack` and does not always find the optimal solution to the problem but reduces the computational complexity considerably. The initial computation time for n = 1000000 objects was 0.85 seconds.
 
 ```{r}
 st <- system.time(bfk <- greedy_knapsack(x = knapsack_objects[1:1000000,], W = 2000))
-print(paste0("time needed: ", toString(as.numeric(st)[1]), "s"))
+print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
 ```
+
+Profiling the `greedy_knapsack` function with `profvis` showed that the the bottleneck is the `order()` function. This function is already very fast and therefore needs no enhancement.
