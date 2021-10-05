@@ -10,6 +10,8 @@ brute_force_knapsack(x, W, parallel = FALSE)
 \item{x}{dataframe with columns w and v (weight and value) representing the items}
 
 \item{W}{double representing the weight limit of the knapsack}
+
+\item{parallel}{boolean whether the code should be run in parallel or not. Default is to FALSE.}
 }
 \value{
 list with the value of the items in the knapsack and the elements contained in the knapsack.
