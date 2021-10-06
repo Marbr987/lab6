@@ -55,10 +55,10 @@ For profiling the code the `profvis` package was used. After loading the package
 
 ### Computational Complexity of the Algorithms and Improvements
 #### Brute Force Algorithm
-The first function is called `brute_force_knapsack` and solves the problem by testing every possible combination of elements in the knapsack and calculating their weight. The initial computation time for n = 16 objects was 13 seconds.
+The first function is called `brute_force_knapsack` and solves the problem by testing every possible combination of elements in the knapsack and calculating their weight. The initial computation time for n = 16 objects was 15 seconds.
 
 ```{r}
-st <- system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000))
+st <- system.time(brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000))
 print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
 ```
 
@@ -75,16 +75,14 @@ Profiling the code with `profvis` showed that the initially used for-loop is by 
 to a parallel computation:
 
 ```{r eval=FALSE}
-  for (i in counter) {
-    temp_dfs <- parallel::mclapply(combinations, function(y){y * x})
-    values <- sapply(temp_dfs, function(x){sum(x$v)})
-    weights <- sapply(temp_dfs, function(x){sum(x$w)})
-  }
+  temp_dfs <- parallel::mclapply(combinations, function(y){y * x})
+  values <- sapply(temp_dfs, function(x){sum(x$v)})
+  weights <- sapply(temp_dfs, function(x){sum(x$w)})
 ```
 
-The computation time needed for 16 objects with parallel computation is 0.5 seconds resulting in a performance gain of 12.5 seconds.
+The computation time needed for 16 objects with parallel computation is 0.5 seconds resulting in a performance gain of 14.5 seconds.
 ```{r}
-st <- system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000, parallel=TRUE))
+st <- system.time(brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000, parallel=TRUE))
 print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
 ```
 
@@ -92,7 +90,7 @@ print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
 The second function is called `knapsack_dynamic` and solves the problem by iterating over all possible values of w. The initial computation time for n = 500 objects was 2.5 seconds.
 
 ```{r}
-st <- system.time(bfk <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 2000))
+st <- system.time(knapsack_dynamic(x = knapsack_objects[1:500,], W = 2000))
 print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
 ```
 
@@ -105,7 +103,7 @@ for (i in 1:nrow(x)) {
       m[i+1, j+1] <- m[i, j+1]			
     }			
     else {			
-      m[i+1, j+1] <- max(m[i, j+1], m[i, j-x$w[i]+1] + x$v[i])			
+      m[i+1, j+1] <- max(m[i, j+1], m[i, j-x$w[i]+1] + x$v[i]) # takes aspecially long			
     }			
   }
 }
@@ -132,7 +130,7 @@ for (i in 1:nrow(x)) {
 The third and last function is called `greedy_knapsack` and does not always find the optimal solution to the problem but reduces the computational complexity considerably. The initial computation time for n = 1000000 objects was 0.85 seconds.
 
 ```{r}
-st <- system.time(bfk <- greedy_knapsack(x = knapsack_objects[1:1000000,], W = 2000))
+st <- system.time(greedy_knapsack(x = knapsack_objects[1:1000000,], W = 2000))
 print(paste0("time needed: ", toString(round(as.numeric(st)[1], 2)), "s"))
 ```
 
