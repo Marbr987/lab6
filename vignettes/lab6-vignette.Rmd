@@ -126,7 +126,7 @@ for (i in 1:nrow(x)) {
 }
 ```
 
-#### Brute Force Algorithm
+#### Greedy Algorithm
 The third and last function is called `greedy_knapsack` and does not always find the optimal solution to the problem but reduces the computational complexity considerably. The initial computation time for n = 1000000 objects was 0.85 seconds.
 
 ```{r}
